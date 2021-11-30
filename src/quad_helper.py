@@ -2,13 +2,11 @@
 
 import numpy as np
 import math
-import sim
-import sim_rotors
-import PID
+import sim, sim_rotors, PID
 import time
-#import tf.transformations
-import transformations
 
+#import tf.transformations
+import transformations 
 
 class quad_helper(object):
     def __init__(self, clientID):
