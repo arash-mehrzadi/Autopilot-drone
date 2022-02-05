@@ -8,7 +8,7 @@ import sim
 
 floor_x = 5
 floor_y = 5
-simulation_time = 10  # sec
+simulation_time = 120  # sec
 
 
 def calc_pos(pos):
@@ -16,7 +16,7 @@ def calc_pos(pos):
         pos = pos + np.array([0.1, 0, 0])
 
     if(pos[1] < floor_y):
-        pos = pos + np.array([0, 0.1, 0])
+        pos = pos + np.array([0, 0, 0])
 
     #pos = pos + np.array([0.1, 0.1, 0])
     return pos
@@ -43,25 +43,34 @@ try:
     d1 = 0
 
     # Getting object position with respect to first joint
-    #pos = quad_functions.get_position()
+    pos = quad_functions.get_position()
 
     # Getting object orientation with respect to first joint
     orien = quad_functions.get_orientation()
-    quad_pos = np.array([0, 0, 0.1])
+    quad_pos = np.array([0.0, 0.1, 0.1])
+    quad_functions.move_quad([0.5, 0.1, 0.1])
+    steps=0
+    while steps != 25:
+        time.sleep(0.5)
+        quad_pos = quad_pos + np.array([0.0, 0.1, 0.0])
+        quad_functions.move_quad(quad_pos)
+        print("step:{}".format(steps))
+        sim.simxSynchronousTrigger(clientID)
+        steps += 1
 
     while sim.simxGetConnectionId(clientID) != -1:
         elapsed_time = time.time()-init_time
 
         # Moving to grasping position
         quad_pos = calc_pos(quad_pos)
-        print(quad_pos)
-        quad_functions.move_quad(
-            [quad_pos[0], quad_pos[1], quad_pos[2]])
+        #print(quad_pos)
 
-        # time.sleep(0.3)
+        #quad_functions.move_quad([quad_pos[0], quad_pos[1], quad_pos[2]])
+
+        #time.sleep(0.3)
 
         sim.simxSynchronousTrigger(clientID)
-        print(elapsed_time)
+        #print(elapsed_time)
         if elapsed_time > simulation_time:
             raise KeyboardInterrupt
 
