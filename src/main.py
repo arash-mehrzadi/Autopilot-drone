@@ -517,7 +517,7 @@ class Robot:
 
         print("ALPHA: " + str(alpha))
 
-        sign = True  # right side
+        sign = True  # right propellers
 
         rad_alpha = 0
 
@@ -590,12 +590,12 @@ class Robot:
         return robot_handle
 
     def _init_MTs_handles(self):
-        error_code, left_side_handle = sim.simxGetObjectHandle(
-            self._client_id, 'Quadricopter_leftside', sim.simx_opmode_oneshot_wait)
-        error_code, right_side_handle = sim.simxGetObjectHandle(
-            self._client_id, 'Quadricopter_rightside', sim.simx_opmode_oneshot_wait)
+        error_code, left_propellers_handle = sim.simxGetObjectHandle(
+            self._client_id, 'Quadricopter_leftpropellers', sim.simx_opmode_oneshot_wait)
+        error_code, right_propellers_handle = sim.simxGetObjectHandle(
+            self._client_id, 'Quadricopter_rightpropellers', sim.simx_opmode_oneshot_wait)
         # @TODO: add checks for error codes
-        return left_side_handle, right_side_handle
+        return left_propellers_handle, right_propellers_handle
 
     def get_left_MT_handle(self):
         return self._left_MT_handle
@@ -739,8 +739,8 @@ class quad_helper(object):
 
     def _init_MTs_handle(self):
         # get handles of robot MTs
-        error_code, self.left_side_handle = sim.simxGetObjectHandle(self.client_id, 'Quadricopter_leftside', sim.simx_opmode_oneshot_wait)
-        error_code, self.right_side_handle = sim.simxGetObjectHandle(self.client_id, 'Quadricopter_rightside', sim.simx_opmode_oneshot_wait)
+        error_code, self.left_propellers_handle = sim.simxGetObjectHandle(self.client_id, 'Quadricopter_leftpropellers', sim.simx_opmode_oneshot_wait)
+        error_code, self.right_propellers_handle = sim.simxGetObjectHandle(self.client_id, 'Quadricopter_rightpropellers', sim.simx_opmode_oneshot_wait)
 
     def _init_sensor_handles(self):
 
@@ -773,8 +773,8 @@ class quad_helper(object):
         self.bot_euler_angles = Vector3(x=bot_euler_angles[0], y=bot_euler_angles[1], z=bot_euler_angles[2])
 
     def stop_move(self):
-        error_code = sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  0, sim.simx_opmode_streaming)
-        error_code = sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, 0, sim.simx_opmode_streaming)
+        error_code = sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  0, sim.simx_opmode_streaming)
+        error_code = sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, 0, sim.simx_opmode_streaming)
 
     def read_from_sensors(self):
 
@@ -871,19 +871,19 @@ class DistBug(BugBase):
         angle = angle_between_vectors(self.bot_dir, self.target_pos.minus(self.bot_pos))
 
         if math.fabs(angle) > 1.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
         else:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED, sim.simx_opmode_streaming)
 
     def action_rotating(self):
 
         angle = angle_between_vectors(self.bot_dir, self.target_dir)
 
         if math.fabs(angle) > 5.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,   angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, -angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,   angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, -angle, sim.simx_opmode_streaming)
         else:
             self.state = States.ROUNDING
 
@@ -911,8 +911,8 @@ class DistBug(BugBase):
         u_obstacle_dist_stab = self.obstacle_dist_stab_PID.output(obstacle_dist)
         u_obstacle_follower = self.obstacle_follower_PID.output(delta)
 
-        sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
-        sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
 
 class RobotRoundingState:
     START = 1
@@ -971,19 +971,19 @@ class Bug1(BugBase):
         angle = angle_between_vectors(self.bot_dir, self.target_pos.minus(self.bot_pos))
 
         if math.fabs(angle) > 1.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
         else:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED, sim.simx_opmode_streaming)
 
     def action_rotating(self):
 
         angle = angle_between_vectors(self.bot_dir, self.target_dir)
 
         if math.fabs(angle) > 5.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,   angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, -angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,   angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, -angle, sim.simx_opmode_streaming)
         else:
             self.state = States.ROUNDING
 
@@ -1024,8 +1024,8 @@ class Bug1(BugBase):
         u_obstacle_dist_stab = self.obstacle_dist_stab_PID.output(obstacle_dist)
         u_obstacle_follower = self.obstacle_follower_PID.output(delta)
 
-        sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
-        sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
 
     def is_cur_pos_near_start_rounding_pos(self, radius):
         # (x-x0)^2 + (y-y0)^2 <= R^2
@@ -1087,19 +1087,19 @@ class Bug2(BugBase):
         angle = angle_between_vectors(self.bot_dir, self.target_pos.minus(self.bot_pos))
 
         if math.fabs(angle) > 1.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - angle, sim.simx_opmode_streaming)
         else:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED, sim.simx_opmode_streaming)
 
     def action_rotating(self):
 
         angle = angle_between_vectors(self.bot_dir, self.target_dir)
 
         if math.fabs(angle) > 5.0 * self.PI / 180.0:
-            sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,   angle, sim.simx_opmode_streaming)
-            sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, -angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,   angle, sim.simx_opmode_streaming)
+            sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, -angle, sim.simx_opmode_streaming)
         else:
             self.state = States.ROUNDING
 
@@ -1119,8 +1119,8 @@ class Bug2(BugBase):
         u_obstacle_dist_stab = self.obstacle_dist_stab_PID.output(obstacle_dist)
         u_obstacle_follower = self.obstacle_follower_PID.output(delta)
 
-        sim.simxSetJointTargetVelocity(self.client_id, self.left_side_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
-        sim.simxSetJointTargetVelocity(self.client_id, self.right_side_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.left_propellers_handle,  self.MT_SPEED + u_obstacle_follower + u_obstacle_dist_stab - (1 - self.detect[4]), sim.simx_opmode_streaming)
+        sim.simxSetJointTargetVelocity(self.client_id, self.right_propellers_handle, self.MT_SPEED - u_obstacle_follower - u_obstacle_dist_stab + (1 - self.detect[4]), sim.simx_opmode_streaming)
 
     def is_bot_on_the_constant_direction(self):
         # (x-x1)/(x2-x1) = (y-y1)/(y2-y1).
