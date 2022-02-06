@@ -10,7 +10,6 @@ import transformations
 
 class quad_helper(object):
     def __init__(self, clientID):
-
         self.clientID = clientID
         self.quadHandle = None
         self.pos = [0, 0, 0]
@@ -20,8 +19,8 @@ class quad_helper(object):
         self.target_z = 0.0
 
         '''
-		Initializing angular rate PID controller
-		'''
+        Initializing angular rate PID controller
+        '''
         # Tuned by plotting output graphs in vrep
         self.P_roll_rate = 0.1
         self.P_pitch_rate = 0.1
@@ -39,8 +38,8 @@ class quad_helper(object):
         self.yaw_rate_pid.SetPoint = 0
 
         '''
-		Initializing attitude PID controller
-		'''
+        Initializing attitude PID controller
+        '''
         # Tuned by plotting output graphs in vrep
         self.P_roll = 0.6
         self.P_pitch = 0.6
@@ -62,8 +61,8 @@ class quad_helper(object):
         self.height_pid.SetPoint = 2
 
         '''
-		Initializing position PID controller
-		'''
+        Initializing position PID controller
+        '''
         # Tuned by plotting output graphs in vrep
         self.P_x = 0.02
         self.P_y = 0.02
@@ -286,6 +285,7 @@ class quad_helper(object):
         # Sets quadcopter position
         sim.simxSetObjectPosition(
             self.clientID, self.quadTargetHandle, -1, pos, sim.simx_opmode_oneshot)
+
 
     '''
 	This function gets the object position
